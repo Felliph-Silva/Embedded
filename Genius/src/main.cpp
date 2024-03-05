@@ -16,6 +16,16 @@ bool compare(uint8_t *sequence_led, uint8_t  *sequence_buttom, uint8_t times) //
   return true;
 }
 
+uint8_t number(uint8_t led, uint8_t Led[])
+{
+  for(uint8_t i = 0; i < 4; i++)
+  {
+    if(i == led)
+    {
+      (Led[i], HIGH);
+    }
+  }
+}
 
 void setup() {
   for(int i = 0; i < 4; i++)
