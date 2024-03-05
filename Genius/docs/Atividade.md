@@ -1,4 +1,4 @@
-#Genius Game
+# Genius Game
 
 Implemente um jogo de memória inspirado no clássico "Genius", utilizando LEDs e botões.
 
@@ -6,7 +6,8 @@ O jogo consistirá em criar um sistema embarcado que apresentará sequências al
 
 A complexidade do jogo aumentará à medida que o jogador avança nas rodadas, exigindo maior concentração e memória para acompanhar as sequências geradas. O sistema pode conter alguma limitação de tamanho máximo de sequencia gerada - esse número pode ser grande o suficiente para que um humano com habilidades medianas de memória nunca consiga vencer o jogo.
 
-##Requisitos
+## Requisitos
+
 1) O jogo deve começar com uma sequência inicial de LEDs que acende e apaga em uma ordem específica - você pode escolher qual o tamanho dessa sequencia inicial;
 2) O jogador deve ser capaz de ver e memorizar essa sequência. Após a sequência inicial, o jogador deve tentar reproduzir a sequência pressionando os botões na ordem correta.
 3) A sequência inicial de LEDs deve aumentar gradualmente em complexidade à medida que o jogador avança no jogo. Cada rodada do jogo deve aumentar em pelo menos um elemento da sequência.
