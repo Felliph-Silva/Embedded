@@ -8,9 +8,9 @@
 
 uint8_t Led[] = {0, 1, 2, 3};
 uint8_t button[] = {4, 5, 6, 7};
-uint8_t round = 0;
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
+uint8_t round_game = 0;
 uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
 uint8_t *button_sequence = NULL;
 
@@ -71,9 +71,23 @@ void reset_sequence(uint8_t *sequence) //Clear sequence
   sequence = NULL; //Turn the sequence pointer null
 }
 
+void complete_level()
+{
+  bool state = true;
+  for (uint8_t j = 0; j < 4; ++j)
+  {
+    for (uint8_t i = 0; i < 4; i++)
+    {
+      digitalWrite(Led[i], state);
+    }
+    delay(400);
+    state =!state;
+  }
+}
+
 State state() //Function that returns the game state
 {
-  if (round == size_sequence_Led)
+  if (round_game == size_sequence_Led)
   {
     return READY;
   }
@@ -86,7 +100,7 @@ State state() //Function that returns the game state
   {
     if (compare(Led_sequence, button_sequence))
     {
-      if (round == Difficulty_level)
+      if (round_game == Difficulty_level)
       {
         return SUCESSFULL_END;
       }
@@ -102,7 +116,7 @@ void setup() {
     pinMode(Led[i], OUTPUT);
     pinMode(button[i], INPUT_PULLUP);
     digitalWrite(Led[i], LOW);
-  }  
+  }
 }
 
 void loop() {
@@ -140,19 +154,19 @@ void loop() {
     size_sequence_Led++;
     size_sequence_button = 0;
     reset_sequence(button_sequence);
-    round++;
-    delay(200);
+    round_game++;
+    complete_level();
     break;
   
   case SUCESSFULL_END:
     size_sequence_Led = 0;
-    round = 0;
+    round_game = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
-
     break;
   
   case FAILLURE_END:
+    round_game = 0;
     size_sequence_Led = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
