@@ -10,7 +10,7 @@ uint8_t Led[] = {0, 1, 2, 3};
 uint8_t button[] = {4, 5, 6, 7};
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
-uint8_t round_game = 0;
+uint8_t round_game = 1;
 uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
 uint8_t *button_sequence = NULL;
 
@@ -50,7 +50,7 @@ void turn_on_Led(uint8_t Led[], uint8_t num) //Function to turn on certain LED b
     }
     else pinMode(Led[i], LOW);
   }
-  delay(500);
+  delay(1000);
 }
 
 void add_to_sequence(uint8_t *sequence, uint8_t size, int num) //Add a new value to array of sequence
@@ -71,7 +71,7 @@ void reset_sequence(uint8_t *sequence) //Clear sequence
   sequence = NULL; //Turn the sequence pointer null
 }
 
-void complete_level()
+void game_over()
 {
   bool state = true;
   for (uint8_t j = 0; j < 4; ++j)
@@ -80,19 +80,19 @@ void complete_level()
     {
       digitalWrite(Led[i], state);
     }
-    delay(400);
+    delay(500);
     state =!state;
   }
 }
 
 State state() //Function that returns the game state
 {
-  if (round_game == size_sequence_Led)
+  if (round_game > size_sequence_Led)
   {
     return READY;
   }
 
-  if (size_sequence_button < size_sequence_Led)
+  if (size_sequence_button < size_sequence_Led && size_sequence_Led == round_game)
   {
     return WAITING;
   }
@@ -108,9 +108,12 @@ State state() //Function that returns the game state
     }
     else return FAILLURE_END;
   }
+  return WAITING;
 }
 
 void setup() {
+
+  Serial.begin(9600);
   for(int i = 0; i < 4; i++) //Initit the pins
   {
     pinMode(Led[i], OUTPUT);
@@ -155,7 +158,11 @@ void loop() {
     size_sequence_button = 0;
     reset_sequence(button_sequence);
     round_game++;
-    complete_level();
+    for (uint8_t i = 0; i < 3; i++)
+      {
+      turn_on_Led(Led, 0);
+      delay(500);
+      }
     break;
   
   case SUCESSFULL_END:
@@ -163,6 +170,11 @@ void loop() {
     round_game = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
+    for (uint8_t i = 0; i < 3; i++)
+      {
+      turn_on_Led(Led, 0);
+      delay(500);
+      }
     break;
   
   case FAILLURE_END:
@@ -170,6 +182,7 @@ void loop() {
     size_sequence_Led = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
+    game_over();
     break;
 
   default:
