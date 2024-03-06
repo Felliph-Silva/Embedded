@@ -72,7 +72,7 @@ void reset_sequence(uint8_t *sequence) //Clear sequence
   sequence = NULL; //Turn the sequence pointer null
 }
 
-void game_over()
+void game_over() //Blink the leds in game over
 {
   bool state = true;
   for (uint8_t j = 0; j < 4; ++j)
@@ -86,7 +86,7 @@ void game_over()
   }
 }
 
-void pressing_button()
+void pressing_button() //Function that saves button pressed by the user
 {
   for (uint8_t i = 0; i < 4; i++)
   {
@@ -160,7 +160,7 @@ void loop() {
     }
     round_game++;
     Led_sequence++;
-    delay(300);
+    delay(100);
     break;
 
   case READY:
@@ -185,7 +185,6 @@ void loop() {
     for (uint8_t i = 0; i < 3; i++)
       {
       turn_on_Led(Led, 0);
-      delay(500);
       }
     break;
   
