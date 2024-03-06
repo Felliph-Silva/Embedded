@@ -2,12 +2,11 @@
 //March 2024
 
 #include <Arduino.h>
-#include <time.h>
 
 #define Difficulty_level 7
 
 uint8_t Led[] = {13, 12, 11, 10};
-uint8_t button[] = {3, 2, 1, 0};
+uint8_t button[] = {5, 4, 3, 2};
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
 uint8_t round_game = 0;
@@ -69,7 +68,7 @@ void add_to_sequence(uint8_t *sequence, uint8_t size, int num) //Add a new value
 
 void reset_sequence(uint8_t *sequence) //Clear sequence
 {
-  sequence = NULL; //Turn the sequence pointer null
+  delete [] sequence; //Turn the sequence pointer null
 }
 
 void game_over() //Blink the leds in game over
@@ -96,7 +95,7 @@ void pressing_button() //Function that saves button pressed by the user
       add_to_sequence(button_sequence, size_sequence_button, button[i]);
       while(digitalRead(button[i]) == LOW)
       {
-
+        turn_on_Led(Led,i);
       }
     }
   }
@@ -119,7 +118,7 @@ GAME_STATE game_state() //Function that returns the game state
     return WAITING;
   }
 
-  else if (size_sequence_button == size_sequence_Led)
+  else if (size_sequence_button == size_sequence_Led && round_game > 0)
   {
     if (compare(Led_sequence, button_sequence))
     {
@@ -131,7 +130,6 @@ GAME_STATE game_state() //Function that returns the game state
     }
     else return FAILLURE_END;
   }
-  return FAILLURE_END;
 }
 
 void setup() {
@@ -143,11 +141,10 @@ void setup() {
     pinMode(button[i], INPUT_PULLUP);
     digitalWrite(Led[i], LOW);
   }
+  randomSeed(analogRead(0));
 }
 
 void loop() {
-  srand(time(NULL));
-
   switch (game_state())
   {
   case START:
@@ -164,7 +161,7 @@ void loop() {
     break;
 
   case READY:
-    add_to_sequence(Led_sequence, size_sequence_Led, rand() % 4);
+    add_to_sequence(Led_sequence, size_sequence_Led, random(0,4));
     for (uint8_t i = 0; i < size_sequence_Led; i++)
     {
       turn_on_Led(Led, Led_sequence[i]);
