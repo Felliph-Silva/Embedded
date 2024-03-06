@@ -6,8 +6,8 @@
 
 #define Difficulty_level 7
 
-uint8_t Led[] = {0, 1, 2, 3};
-uint8_t button[] = {4, 5, 6, 7};
+uint8_t Led[] = {13, 12, 11, 10};
+uint8_t button[] = {3, 2, 1, 0};
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
 uint8_t round_game = 0;
