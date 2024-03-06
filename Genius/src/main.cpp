@@ -8,11 +8,29 @@
 
 uint8_t Led[] = {0, 1, 2, 3};
 uint8_t button[] = {4, 5, 6, 7};
+uint8_t round = 0;
+uint8_t size_sequence_Led = 0;
+uint8_t size_sequence_button = 0;
+uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
+uint8_t *button_sequence = NULL;
 
+enum State //Enum structure for game state
+{ 
+  READY,
+  WAITING,
+  NEXT_ROUND,
+  SUCESSFULL_END,
+  FAILLURE_END
+};
 
-bool compare(uint8_t *sequence_led, uint8_t  *sequence_button, uint8_t times) //Function to compare if the sequence of led is equal to the sequence of button;
+bool compare(uint8_t *sequence_led, uint8_t *sequence_button) //Function to compare if the sequence of led is equal to the sequence of button;
 {
-  for (uint8_t i = 0; i < times; i++)
+  if(size_sequence_button != size_sequence_Led)
+  {
+    return false;
+  }
+
+  for (uint8_t i = 0; i < size_sequence_button; i++)
   {
     if (sequence_led[i]!= sequence_button[i])
     {
@@ -28,13 +46,14 @@ void turn_on_Led(uint8_t Led[], uint8_t num) //Function to turn on certain LED b
   {
     if(i == num)
     {
-      (Led[i], HIGH);
+      pinMode(Led[i], HIGH);
     }
-    else((Led[i], LOW));
+    else pinMode(Led[i], LOW);
   }
+  delay(500);
 }
 
-void add_to_sequence(uint8_t *sequence, uint8_t size, uint8_t num) //Add a new value to array of sequence
+void add_to_sequence(uint8_t *sequence, uint8_t size, int num) //Add a new value to array of sequence
 {
   uint8_t *ptr = sequence;
   sequence = new uint8_t[size+1];
@@ -52,22 +71,94 @@ void reset_sequence(uint8_t *sequence) //Clear sequence
   sequence = NULL; //Turn the sequence pointer null
 }
 
+State state() //Function that returns the game state
+{
+  if (round == size_sequence_Led)
+  {
+    return READY;
+  }
+
+  if (size_sequence_button < size_sequence_Led)
+  {
+    return WAITING;
+  }
+  if (size_sequence_button == size_sequence_Led)
+  {
+    if (compare(Led_sequence, button_sequence))
+    {
+      if (round == Difficulty_level)
+      {
+        return SUCESSFULL_END;
+      }
+      return NEXT_ROUND;
+    }
+    else return FAILLURE_END;
+  }
+}
+
 void setup() {
-  for(int i = 0; i < 4; i++)
+  for(int i = 0; i < 4; i++) //Initit the pins
   {
     pinMode(Led[i], OUTPUT);
     pinMode(button[i], INPUT_PULLUP);
     digitalWrite(Led[i], LOW);
-  }
-  uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
-  uint8_t *button_sequence = NULL;
+  }  
 }
 
 void loop() {
   srand(time(NULL));
 
-  uint8_t rdm = rand() % 4;
+  switch (state())
+  {
+  case READY:
+    add_to_sequence(Led_sequence, size_sequence_Led, rand() % 4);
+    for (uint8_t i = 0; i < size_sequence_Led; i++)
+    {
+      turn_on_Led(Led, Led_sequence[i]);
+      delay(500);
+    }
+    break;
   
+  case WAITING:
+    for (uint8_t i = 0; i < 4; i++)
+    {
+      if(digitalRead(button[i]) == LOW)
+      {
+        size_sequence_button++;
+        add_to_sequence(button_sequence, size_sequence_button, i);
+        
+      }
+      while(digitalRead(button[i]) == LOW)
+      {
+
+      }
+    }
+    
+    break;
+
+  case NEXT_ROUND:
+    size_sequence_Led++;
+    size_sequence_button = 0;
+    reset_sequence(button_sequence);
+    round++;
+    delay(200);
+    break;
   
-  delay(100);
+  case SUCESSFULL_END:
+    size_sequence_Led = 0;
+    round = 0;
+    reset_sequence(button_sequence);
+    reset_sequence(Led_sequence);
+
+    break;
+  
+  case FAILLURE_END:
+    size_sequence_Led = 0;
+    reset_sequence(button_sequence);
+    reset_sequence(Led_sequence);
+    break;
+
+  default:
+    break;
+  }
 }
