@@ -10,12 +10,13 @@ uint8_t Led[] = {0, 1, 2, 3};
 uint8_t button[] = {4, 5, 6, 7};
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
-uint8_t round_game = 1;
+uint8_t round_game = 0;
 uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
 uint8_t *button_sequence = NULL;
 
-enum State //Enum structure for game state
+enum GAME_STATE //Enum structure for game state
 { 
+  START,
   READY,
   WAITING,
   NEXT_ROUND,
@@ -85,18 +86,40 @@ void game_over()
   }
 }
 
-State state() //Function that returns the game state
+void pressing_button()
 {
-  if (round_game > size_sequence_Led)
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    if (digitalRead(button[i]) == LOW)
+    {
+      size_sequence_button++;
+      add_to_sequence(button_sequence, size_sequence_button, button[i]);
+      while(digitalRead(button[i]) == LOW)
+      {
+
+      }
+    }
+  }
+  delay(100);
+}
+
+GAME_STATE game_state() //Function that returns the game state
+{
+  if (round_game == 0)
+  {
+    return START;
+  }
+  else if (round_game == size_sequence_Led)
   {
     return READY;
   }
 
-  if (size_sequence_button < size_sequence_Led && size_sequence_Led == round_game)
+  else if (size_sequence_button < size_sequence_Led)
   {
     return WAITING;
   }
-  if (size_sequence_button == size_sequence_Led)
+
+  else if (size_sequence_button == size_sequence_Led)
   {
     if (compare(Led_sequence, button_sequence))
     {
@@ -108,7 +131,7 @@ State state() //Function that returns the game state
     }
     else return FAILLURE_END;
   }
-  return WAITING;
+  return FAILLURE_END;
 }
 
 void setup() {
@@ -125,8 +148,21 @@ void setup() {
 void loop() {
   srand(time(NULL));
 
-  switch (state())
+  switch (game_state())
   {
+  case START:
+    for (uint8_t i = 0; i < 4; i++)
+    {
+      while(digitalRead(button[i])==LOW)
+      {
+
+      }
+    }
+    round_game++;
+    Led_sequence++;
+    delay(300);
+    break;
+
   case READY:
     add_to_sequence(Led_sequence, size_sequence_Led, rand() % 4);
     for (uint8_t i = 0; i < size_sequence_Led; i++)
@@ -137,20 +173,8 @@ void loop() {
     break;
   
   case WAITING:
-    for (uint8_t i = 0; i < 4; i++)
-    {
-      if(digitalRead(button[i]) == LOW)
-      {
-        size_sequence_button++;
-        add_to_sequence(button_sequence, size_sequence_button, i);
-        
-      }
-      while(digitalRead(button[i]) == LOW)
-      {
+  pressing_button();
 
-      }
-    }
-    
     break;
 
   case NEXT_ROUND:
