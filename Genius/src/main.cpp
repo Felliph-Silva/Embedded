@@ -5,11 +5,15 @@
 
 #define Difficulty_level 7
 
+//Redefine function to satatic memory;
 uint8_t Led[] = {13, 12, 11, 10};
 uint8_t button[] = {5, 4, 3, 2};
 uint8_t size_sequence_Led = 0;
 uint8_t size_sequence_button = 0;
 uint8_t round_game = 0;
+
+uint8_t au8_sequencia[Difficulty_level];
+uint8_t u8Indexsenquencia = 0;
 uint8_t *Led_sequence = NULL; //Storage the Led sequence and button sequence by dynamic allocation
 uint8_t *button_sequence = NULL;
 
@@ -53,6 +57,14 @@ void turn_on_Led(uint8_t Led[], uint8_t num) //Function to turn on certain LED b
   delay(1000);
 }
 
+void add_new_sequence()
+{
+  au8_sequencia[u8Indexsenquencia] = random(0,4);
+  u8Indexsenquencia++;
+}
+
+
+
 void add_to_sequence(uint8_t *sequence, uint8_t size, int num) //Add a new value to array of sequence
 {
   uint8_t *ptr = sequence;
@@ -68,6 +80,7 @@ void add_to_sequence(uint8_t *sequence, uint8_t size, int num) //Add a new value
 
 void reset_sequence(uint8_t *sequence) //Clear sequence
 {
+  u8Indexsenquencia = 0;
   delete [] sequence; //Turn the sequence pointer null
 }
 
@@ -108,17 +121,16 @@ GAME_STATE game_state() //Function that returns the game state
   {
     return START;
   }
-  else if (round_game == size_sequence_Led)
+  if (round_game == size_sequence_Led)
   {
+    if (size_sequence_button < size_sequence_Led)
+    {
+    return WAITING;
+    }
     return READY;
   }
 
-  else if (size_sequence_button < size_sequence_Led)
-  {
-    return WAITING;
-  }
-
-  else if (size_sequence_button == size_sequence_Led && round_game > 0)
+  if (size_sequence_button == size_sequence_Led && round_game > 0)
   {
     if (compare(Led_sequence, button_sequence))
     {
@@ -188,18 +200,20 @@ void loop() {
   case SUCESSFULL_END:
     size_sequence_Led = 0;
     round_game = 0;
+    size_sequence_button = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
     for (uint8_t i = 0; i < 3; i++)
       {
       turn_on_Led(Led, 0);
       delay(500);
-      }
+      }size_sequence_button = 0;
     break;
   
   case FAILLURE_END:
     round_game = 0;
     size_sequence_Led = 0;
+    size_sequence_button = 0;
     reset_sequence(button_sequence);
     reset_sequence(Led_sequence);
     game_over();
