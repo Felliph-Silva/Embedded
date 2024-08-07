@@ -1,21 +1,5 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
-
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}#include <LiquidCrystal.h>  // Inclua a biblioteca para controle do display LCD
+#include <LiquidCrystal.h>  // Inclua a biblioteca para controle do display LCD
 
 // Definição dos pinos
 #define PUMP1_1      2
@@ -105,32 +89,16 @@ void checkButtons() {
 
 void runMixingCycle() {
   displayMessage("Acionando bomba 1...");
-  digitalWrite(PUMP1_1, HIGH);
-  digitalWrite(PUMP1_2, LOW);
-  delay(5000); // Aguarda 5 segundos
-  digitalWrite(PUMP1_1, LOW);
-  digitalWrite(PUMP1_2, LOW);
-  
+  turnOnPump1();
+
   displayMessage("Acionando bomba 2...");
-  digitalWrite(PUMP2_1, HIGH);
-  digitalWrite(PUMP2_2, LOW);
-  while (digitalRead(HIGH_LEVEL) == LOW) {
-    // Aguarda até o sensor de nível cheio ser ativado
-  }
-  digitalWrite(PUMP2_1, LOW);
-  digitalWrite(PUMP2_2, LOW);
-  
+  turnOnPump2();
+
   displayMessage("Ligando misturador...");
-  digitalWrite(MIXER, HIGH);
-  delay(5000); // Aguarda 5 segundos
-  digitalWrite(MIXER, LOW);
-  
+  turnOnMixer()
+
   displayMessage("Esvaziando recipiente...");
-  digitalWrite(VALVE, HIGH);
-  while (digitalRead(LOW_LEVEL) == LOW) {
-    // Aguarda até o sensor de nível vazio ser ativado
-  }
-  digitalWrite(VALVE, LOW);
+  emptyContainer();
   
   displayMessage("Ciclo concluído");
   delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
@@ -138,7 +106,7 @@ void runMixingCycle() {
 }
 
 void emptyContainer() {
-  displayMessage("Esvaziando recipiente...");
+  
   digitalWrite(VALVE, HIGH);
   while (digitalRead(LOW_LEVEL) == LOW) {
     // Aguarda até o sensor de nível vazio ser ativado
@@ -147,6 +115,32 @@ void emptyContainer() {
   displayMessage("Recipiente esvaziado");
   delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
 }
+
+void turnOnMixer(){
+   
+  digitalWrite(MIXER, HIGH);
+  delay(5000); // Aguarda 5 segundos
+  digitalWrite(MIXER, LOW);
+}
+
+void turnOnPump1(){
+
+  digitalWrite(PUMP1_1, HIGH);
+  digitalWrite(PUMP1_2, LOW);
+  delay(5000); // Aguarda 5 segundos
+  digitalWrite(PUMP1_1, LOW);
+  digitalWrite(PUMP1_2, LOW);
+ }
+ 
+void turnOnPump2(){
+   digitalWrite(PUMP2_1, HIGH);
+  digitalWrite(PUMP2_2, LOW);
+  while (digitalRead(HIGH_LEVEL) == LOW) {
+    // Aguarda até o sensor de nível cheio ser ativado
+  }
+  digitalWrite(PUMP2_1, LOW);
+  digitalWrite(PUMP2_2, LOW);
+ }
 
 void resetToIdle() {
   state = IDLE;
