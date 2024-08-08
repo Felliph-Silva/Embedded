@@ -23,10 +23,13 @@ Durante a execução do ciclo, o estado atual do ciclo será exibido no display 
 ### 3. Interrupção e Esvaziamento
 - **Interrupção do Ciclo:** Ao pressionar o botão `C2` durante a execução de um ciclo, este será interrompido imediatamente. Essa ocorrência será informada no display LCD.
 - **Esvaziamento do Recipiente:** Se o botão `C2` for pressionado quando nenhum ciclo estiver sendo executado, o sistema realizará o esvaziamento do recipiente. Essa operação também será informada no display LCD.
-![Esquema elétrico da planta didática](Esquema-eletrico.png)
-
 
 ## Especificações das Entradas e Saídas Digitais
+O equema elétrico da planta didática será montado conforme a figura 1.
+
+<p align="center">Figura 1: Esquema elétrico da planta didática.</p>
+![Esquema elétrico da planta didática](Esquema-eletrico.png)
+<p align="center">Fonte: Material da atividade.</p>
 
 ### Botões
 - **C1 e C2:** São normalmente abertos. A entrada digital estará em nível lógico alto quando o botão não estiver pressionado e em nível lógico baixo quando o botão estiver pressionado.
@@ -53,6 +56,8 @@ Durante a execução do ciclo, o estado atual do ciclo será exibido no display 
 | **Sensor de Nível CHEIO** | 11           |
 | **Display LCD**           | indefinido ainda|
 
+
+
 ## Implementação
 
 ### 1. Tabela de Máquina de Estados
@@ -69,4 +74,5 @@ Durante a execução do ciclo, o estado atual do ciclo será exibido no display 
 | **INTERRUPTED**           | -                                    | IDLE                    | Retornar ao estado inicial                                  |
 | **Esvaziando Recipiente** | Sensor de Nível VAZIO ativado        | IDLE                    | Parar válvula, Exibir "Recipiente vazio"                     |
 
-### 2.   
+### 2.   Simulação
+Esta implementação foi simulada utilizando o tinkercad, e é possível vizualizar a simulação neste [link](https://www.tinkercad.com/things/4JymtpPK1Lq-funky-borwo/editel?sharecode=jeU74Dh1QXhBi1deMIZKjoglHc_senMifO3WkR5VeX0).
