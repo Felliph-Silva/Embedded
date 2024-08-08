@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include <LiquidCrystal.h>  // Inclua a biblioteca para controle do display LCD
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 // Definição dos pinos
-#define PUMP1_1      2
-#define PUMP1_2      3
-#define PUMP2_1      4
-#define PUMP2_2      5
+#define PUMP1        2
+#define PUMP2        3
+
 
 #define BUTTON_C1    6
 #define BUTTON_C2    7
@@ -17,7 +17,7 @@
 #define HIGH_LEVEL   11
 
 // Definição do LCD
-LiquidCrystal lcd(12, 13, 14, 15, 16, 17); // Ajuste os pinos do LCD conforme sua ligação
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Estados do ciclo
 enum CycleState { IDLE, WAITING_CONFIRMATION, MIXING, INTERRUPTED };
@@ -34,8 +34,13 @@ void setup() {
   prepareSensors();
 
   // Inicializa o display LCD
-  lcd.begin(16, 2); // Ajuste o tamanho do LCD conforme necessário
+  lcd.init();           
+  lcd.backlight();            
+  lcd.clear(); 
   lcd.print("Sistema pronto");
+  
+  Serial.begin(9600);
+  Serial.println("Sistema pronto");
 }
 
 void loop() {
@@ -59,6 +64,7 @@ void loop() {
 
     case INTERRUPTED:
       displayMessage("Ciclo interrompido");
+      Serial.println("Ciclo interrompido");
       delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
       resetToIdle();
       break;
@@ -71,6 +77,7 @@ void checkButtons() {
       state = WAITING_CONFIRMATION;
       lastPressTime = millis();
       displayMessage("Iniciar ciclo? Pressione C1");
+      Serial.println("Iniciar ciclo? Pressione C1");
     } else if (state == WAITING_CONFIRMATION) {
       state = MIXING;
       lastPressTime = millis(); // Reinicia o contador do tempo
@@ -82,65 +89,104 @@ void checkButtons() {
       state = INTERRUPTED;
     } else if (state == IDLE) {
       emptyContainer();
+      resetToIdle();
     }
     delay(200); // Debounce para evitar múltiplos acionamentos
   }
 }
 
 void runMixingCycle() {
-  displayMessage("Acionando bomba 1...");
+  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
   turnOnPump1();
 
-  displayMessage("Acionando bomba 2...");
+  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
   turnOnPump2();
 
-  displayMessage("Ligando misturador...");
-  turnOnMixer()
+  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
+  turnOnMixer();
 
-  displayMessage("Esvaziando recipiente...");
+  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
   emptyContainer();
-  
-  displayMessage("Ciclo concluído");
-  delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
-  resetToIdle();
+
+  if (state == MIXING) {
+    displayMessage("Ciclo concluido");
+    Serial.println("Ciclo concluido");
+    delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
+    resetToIdle();
+  }
+}
+
+bool checkInterrupt() {
+  if (digitalRead(BUTTON_C2) == LOW) {
+    allOff(); // desliga todos os equipamentos
+    state = INTERRUPTED;
+    return true;
+  }
+  return false;
+}
+
+void allOff(){
+    // Desliga todos os equipamentos
+    digitalWrite(PUMP1, LOW);
+    digitalWrite(PUMP2, LOW);
+    digitalWrite(MIXER, LOW);
+    digitalWrite(VALVE, LOW);
 }
 
 void emptyContainer() {
-  
+  displayMessage("Esvaziando recipiente...");
+  Serial.println("Esvaziando recipiente...");
+
   digitalWrite(VALVE, HIGH);
   while (digitalRead(LOW_LEVEL) == LOW) {
-    // Aguarda até o sensor de nível vazio ser ativado
+    if (state == MIXING && checkInterrupt()) return; // Verifica se o botão C2 foi pressionado apenas no estado MIXING
   }
   digitalWrite(VALVE, LOW);
-  displayMessage("Recipiente esvaziado");
-  delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
+  displayMessage("Recipiente vazio");
+  delay(2000); // Mostra a mensagem por 2 segundos
 }
 
-void turnOnMixer(){
-   
+
+void turnOnMixer() {
+  if (state != MIXING) return;
+  
+  unsigned long startTime = millis();
+  displayMessage("Ligando misturador");
+  Serial.println("Ligando misturador");
+
   digitalWrite(MIXER, HIGH);
-  delay(5000); // Aguarda 5 segundos
+  while (millis() - startTime < 5000) {
+    if (checkInterrupt() || state != MIXING) return;  // Verifica se o botão C2 foi pressionado ou o estado mudou
+  }
   digitalWrite(MIXER, LOW);
 }
 
-void turnOnPump1(){
+void turnOnPump1() {
+  if (state != MIXING) return;
+  
+  displayMessage("Acionando bomba1");
+  Serial.println("Acionando bomba 1...");
+  unsigned long startTime = millis();
 
-  digitalWrite(PUMP1_1, HIGH);
-  digitalWrite(PUMP1_2, LOW);
-  delay(5000); // Aguarda 5 segundos
-  digitalWrite(PUMP1_1, LOW);
-  digitalWrite(PUMP1_2, LOW);
- }
- 
-void turnOnPump2(){
-   digitalWrite(PUMP2_1, HIGH);
-  digitalWrite(PUMP2_2, LOW);
-  while (digitalRead(HIGH_LEVEL) == LOW) {
-    // Aguarda até o sensor de nível cheio ser ativado
+  digitalWrite(PUMP1, HIGH);
+  while (millis() - startTime < 5000) {
+    if (checkInterrupt() || state != MIXING) return; // Verifica se o botão C2 foi pressionado ou o estado mudou
   }
-  digitalWrite(PUMP2_1, LOW);
-  digitalWrite(PUMP2_2, LOW);
- }
+  digitalWrite(PUMP1, LOW);
+}
+
+void turnOnPump2() {
+  if (state != MIXING) return;
+
+  displayMessage("Acionando bomba2");
+  Serial.println("Acionando bomba2...");
+
+  digitalWrite(PUMP2, HIGH);
+  while (digitalRead(HIGH_LEVEL) == LOW) {
+    if (checkInterrupt() || state != MIXING) return; // Verifica se o botão C2 foi pressionado ou o estado mudou
+  }
+  digitalWrite(PUMP2, LOW);
+}
 
 void resetToIdle() {
   state = IDLE;
@@ -154,10 +200,8 @@ void displayMessage(String message) {
 }
 
 void preparePumps() {
-  pinMode(PUMP1_1, OUTPUT);
-  pinMode(PUMP1_2, OUTPUT);
-  pinMode(PUMP2_1, OUTPUT);
-  pinMode(PUMP2_2, OUTPUT);
+  pinMode(PUMP1, OUTPUT);
+  pinMode(PUMP2, OUTPUT);
 }
 
 void prepareButtons() {
