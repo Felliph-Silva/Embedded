@@ -23,7 +23,7 @@ Durante a execução do ciclo, o estado atual do ciclo será exibido no display 
 ### 3. Interrupção e Esvaziamento
 - **Interrupção do Ciclo:** Ao pressionar o botão `C2` durante a execução de um ciclo, este será interrompido imediatamente. Essa ocorrência será informada no display LCD.
 - **Esvaziamento do Recipiente:** Se o botão `C2` for pressionado quando nenhum ciclo estiver sendo executado, o sistema realizará o esvaziamento do recipiente. Essa operação também será informada no display LCD.
-![Esquema elétrico da planta didática](Docs/Esquema-eletrico.png)
+![Esquema elétrico da planta didática](Esquema-eletrico.png)
 
 
 ## Especificações das Entradas e Saídas Digitais
