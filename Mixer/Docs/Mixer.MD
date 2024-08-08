@@ -1,7 +1,8 @@
 # Projeto: Misturador de Líquidos com Arduino
 
 ## Descrição Geral
-Este projeto implementa um sistema de mistura de líquidos controlado por um Arduino, utilizando botões, bombas, um misturador, sensores de nível e uma válvula solenoide. O sistema exibe mensagens em um display LCD e permite ao usuário iniciar e controlar o ciclo de mistura, a [planta didática].
+Este projeto implementa um sistema de mistura de líquidos controlado por um Arduino, utilizando botões, bombas, um misturador, sensores de nível e uma válvula solenoide. O sistema exibe mensagens em um display LCD e permite ao usuário iniciar e controlar o ciclo de mistura.
+.
 
 ## Operação do Sistema
 
@@ -22,6 +23,8 @@ Durante a execução do ciclo, o estado atual do ciclo será exibido no display 
 ### 3. Interrupção e Esvaziamento
 - **Interrupção do Ciclo:** Ao pressionar o botão `C2` durante a execução de um ciclo, este será interrompido imediatamente. Essa ocorrência será informada no display LCD.
 - **Esvaziamento do Recipiente:** Se o botão `C2` for pressionado quando nenhum ciclo estiver sendo executado, o sistema realizará o esvaziamento do recipiente. Essa operação também será informada no display LCD.
+<embed src="Docs/Esquema Elétrico - Planta Didática Mistura de Líquidos.pdf" width="800" height="600" type="application/pdf">
+
 
 ## Especificações das Entradas e Saídas Digitais
 
