@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
 
 // Definição dos pinos
-#define PUMP1        2
-#define PUMP2        3
+#define PUMP1        A5
+#define PUMP2        A4
 
+const int rs = 13, en = 12, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 
 #define BUTTON_C1    6
 #define BUTTON_C2    7
@@ -17,14 +17,34 @@
 #define HIGH_LEVEL   11
 
 // Definição do LCD
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // Estados do ciclo
 enum CycleState { IDLE, WAITING_CONFIRMATION, MIXING, INTERRUPTED };
 CycleState state = IDLE;
 
+
 unsigned long lastPressTime = 0;
 const unsigned long TIMEOUT = 10000; // 10 segundos
+
+const unsigned long PUMP_TIME = 5000;  // 5 segundos
+const unsigned long MIXER_TIME = 5000; // 5 segundos
+
+void checkButtons();
+bool checkInterrupt();
+void preparePumps();
+void prepareButtons();
+void prepareActuators();
+void prepareSensors();
+void runMixingCycle();
+void displayMessage(String message);
+void resetToIdle();
+void allOff();
+void emptyContainer();
+void turnOnMixer();
+void turnOnPump1();
+void turnOnPump2();
+void resetToIdle();
 
 void setup() {
   // Configuração dos pinos
@@ -34,8 +54,7 @@ void setup() {
   prepareSensors();
 
   // Inicializa o display LCD
-  lcd.init();           
-  lcd.backlight();            
+  lcd.begin(16, 2);            
   lcd.clear(); 
   lcd.print("Sistema pronto");
   
@@ -70,7 +89,6 @@ void loop() {
       break;
   }
 }
-
 void checkButtons() {
   if (digitalRead(BUTTON_C1) == LOW) {
     if (state == IDLE) {
@@ -194,9 +212,23 @@ void resetToIdle() {
 }
 
 void displayMessage(String message) {
+  if(message.length() >= 16)
+  {
+    String message1 = message.substring(0, 16);
+    String message2 = message.substring(16, message.length());
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(message1);
+    lcd.setCursor(0, 1);
+    lcd.print(message2);
+  }
+  
+  else
+  {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print(message);
+  }
 }
 
 void preparePumps() {

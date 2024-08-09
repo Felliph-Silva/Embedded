@@ -47,15 +47,15 @@ O equema elétrico da planta didática será montado conforme a figura 1.
 
 | Componente              | Pino(s) de I/O |
 |-------------------------|----------------|
-| **Bomba 1**             | 2              |
-| **Bomba 2**             | 3              |
+| **Bomba 1**             | A5             |
+| **Bomba 2**             | A4             |
 | **Botão C1**            | 6              |
 | **Botão C2**            | 7              |
 | **Misturador**          | 8              |
 | **Válvula Solenoide**   | 9              |
 | **Sensor de Nível VAZIO** | 10           |
 | **Sensor de Nível CHEIO** | 11           |
-| **Display LCD**           | indefinido ainda|
+| **Display LCD**           | rs = 13, en = 12, d4 = 5, d5 = 4, d6 = 3 e d7 = 2|
 
 
 
@@ -75,5 +75,7 @@ O equema elétrico da planta didática será montado conforme a figura 1.
 | **INTERRUPTED**           | -                                    | IDLE                    | Retornar ao estado inicial                                  |
 | **Esvaziando Recipiente** | Sensor de Nível VAZIO ativado        | IDLE                    | Parar válvula, Exibir "Recipiente vazio"                     |
 
-### 2.   Simulação
+### 2.   Simulação e montagem
 Esta implementação foi simulada utilizando o tinkercad, e é possível vizualizar a simulação neste [link](https://www.tinkercad.com/things/4JymtpPK1Lq-funky-borwo/editel?sharecode=jeU74Dh1QXhBi1deMIZKjoglHc_senMifO3WkR5VeX0).
+O cógigo do sistema utilizando platformIO pode ser visualizado [aqui](/src/main.cpp)
+
