@@ -31,8 +31,6 @@ const unsigned long PUMP_TIME = 5000;  // 5 segundos
 const unsigned long MIXER_TIME = 5000; // 5 segundos
 
 //Configurações dos sensores
-#define LEVEL_ACHIEVED  0 //sensor atingido em nivel logico baixo
-#define LEVEL_NOT_ACHIEVED !LEVEL_ACHIEVED
 
 void checkButtons();
 bool checkInterrupt();
@@ -160,7 +158,7 @@ void emptyContainer() {
   Serial.println("Esvaziando recipiente...");
 
   digitalWrite(VALVE, HIGH);
-  while (digitalRead(LOW_LEVEL) == LEVEL_ACHIEVED) {
+  while (digitalRead(LOW_LEVEL) == HIGH) {
     if (state == MIXING && checkInterrupt()) return; // Verifica se o botão C2 foi pressionado apenas no estado MIXING
   }
   digitalWrite(VALVE, LOW);
@@ -204,7 +202,7 @@ void turnOnPump2() {
   Serial.println("Acionando bomba2...");
 
   digitalWrite(PUMP2, HIGH);
-  while (digitalRead(HIGH_LEVEL) == LEVEL_NOT_ACHIEVED) {
+  while (digitalRead(HIGH_LEVEL) == HIGH) {
     if (checkInterrupt() || state != MIXING) return; // Verifica se o botão C2 foi pressionado ou o estado mudou
   }
   digitalWrite(PUMP2, LOW);
