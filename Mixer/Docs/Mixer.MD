@@ -2,7 +2,6 @@
 
 ## Descrição Geral
 Este projeto implementa um sistema de mistura de líquidos controlado por um Arduino, utilizando botões, bombas, um misturador, sensores de nível e uma válvula solenoide. O sistema exibe mensagens em um display LCD e permite ao usuário iniciar e controlar o ciclo de mistura.
-.
 
 ## Operação do Sistema
 
@@ -77,5 +76,6 @@ O equema elétrico da planta didática será montado conforme a figura 1.
 
 ### 2.   Simulação e montagem
 Esta implementação foi simulada utilizando o tinkercad, e é possível vizualizar a simulação neste [link](https://www.tinkercad.com/things/4JymtpPK1Lq-funky-borwo/editel?sharecode=jeU74Dh1QXhBi1deMIZKjoglHc_senMifO3WkR5VeX0).
-O cógigo do sistema utilizando platformIO pode ser visualizado [aqui](/src/main.cpp)
+
+O cógigo do sistema utilizando platformIO pode ser visualizado [aqui](/Mixer/src/main.cpp).
 

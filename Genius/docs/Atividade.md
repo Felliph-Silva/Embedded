@@ -1,6 +1,6 @@
 # Genius Game
 
-Implemente um jogo de memória inspirado no clássico ["Genius"](/src/main.cpp), utilizando LEDs e botões. 
+Implemente um jogo de memória inspirado no clássico ["Genius"](/Genius/src/main.cpp), utilizando LEDs e botões.
 
 O jogo consistirá em criar um sistema embarcado que apresentará sequências aleatórias de luzes (LEDs) que deverá ser reproduzida pelo usuário pressionando os botões na mesma ordem. 
 
