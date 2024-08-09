@@ -2,19 +2,19 @@
 #include <LiquidCrystal.h>
 
 // Definição dos pinos
-#define PUMP1        A5
-#define PUMP2        A4
+#define PUMP1        8
+#define PUMP2        9
 
-const int rs = 13, en = 12, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int rs = 12, en = 13, d4 = A2, d5 = A3, d6 = A4, d7 = A5;
 
-#define BUTTON_C1    6
-#define BUTTON_C2    7
+#define BUTTON_C1    A0
+#define BUTTON_C2    A1
 
-#define MIXER        8
-#define VALVE        9
+#define MIXER        7
+#define VALVE        6
 
-#define LOW_LEVEL    10
-#define HIGH_LEVEL   11
+#define LOW_LEVEL    5
+#define HIGH_LEVEL   4
 
 // Definição do LCD
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
