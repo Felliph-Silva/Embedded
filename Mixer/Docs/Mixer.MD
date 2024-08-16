@@ -75,7 +75,7 @@ O equema elétrico da planta didática será montado conforme a figura 1.
 | **MIXING**                | Botão `C2` pressionado               | INTERRUPTED             | Parar todas as operações, Exibir "Ciclo interrompido"        |
 | **MIXING**                | Ciclo de mistura concluído           | IDLE                    | Exibir "Ciclo concluído", retornar ao estado inicial         |
 | **INTERRUPTED**           | -                                    | IDLE                    | Retornar ao estado inicial                                  |
-| **Esvaziando Recipiente** | Sensor de Nível VAZIO ativado        | IDLE                    | Parar válvula, Exibir "Recipiente vazio"                     |
+| **Esvaziando Recipiente** | Sensor de Nível VAZIO desativado     | IDLE                    | Parar válvula, Exibir "Recipiente vazio"                     |
 
 ### 2.   Simulação e montagem
 Esta implementação foi simulada utilizando o tinkercad, e é possível vizualizar a simulação neste [link](https://www.tinkercad.com/things/4JymtpPK1Lq-funky-borwo/editel?sharecode=jeU74Dh1QXhBi1deMIZKjoglHc_senMifO3WkR5VeX0), e o esquemático do circuito simulado no tinkercad se encontra na figura 2.
@@ -89,6 +89,7 @@ Esta implementação foi simulada utilizando o tinkercad, e é possível vizuali
 <p align="center">Fonte: Autoria própria.</p>
 
 O cógigo do sistema utilizando platformIO pode ser visualizado [aqui](/Mixer/src/main.cpp).
+O vídeo da montagem feita em sala está disponível [aqui](https://youtube.com/shorts/JOFedwKAGOI?feature=share).
 
 #### Autores
 
