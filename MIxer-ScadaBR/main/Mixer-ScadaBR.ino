@@ -1,21 +1,39 @@
-#include <WiFi.h>
+#ifdef ESP8266
+ #include <ESP8266WiFi.h>
+#else //ESP32
+ #include <WiFi.h>
+#endif
 #include <ModbusIP_ESP8266.h>
+
 #include <LiquidCrystal.h>
 
-// Definição dos pinos
-#define PUMP1        8
-#define PUMP2        9
+//Modbus Registers Offsets
+const int C1_COIL = 100;
+const int C2_COIL = 101;
+const int PUMP1_COIL = 102;
+const int PUMP2_COIL = 103;
+const int MIXER_COIL = 104;
+const int VALVE_COIL = 105;
+const int LOW_LEVEL_COIL = 106;
+const int HIGH_LEVEL_COIL = 107;
 
-const int rs = 12, en = 13, d4 = A2, d5 = A3, d6 = A4, d7 = A5;
+//Used Pins
+const int PUMP1 = 13;
+const int PUMP2= 12; 
 
-#define BUTTON_C1    A0
-#define BUTTON_C2    A1
+const int BUTTON_C1 = 14;
+const int BUTTON_C2 = 27;
 
-#define MIXER        7
-#define VALVE        6
+const int MIXER = 26;
+const int VALVE = 25;
 
-#define LOW_LEVEL    5
-#define HIGH_LEVEL   4
+const int LOW_LEVEL = 33; 
+const int HIGH_LEVEL = 32; 
+
+const int rs = 35, en = 34, d4 = 2, d5 = 4, d6 = 5, d7 = 18;
+
+//ModbusIP object
+ModbusIP mb;
 
 // Definição do LCD
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
@@ -24,32 +42,36 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 enum CycleState { IDLE, WAITING_CONFIRMATION, MIXING, INTERRUPTED };
 CycleState state = IDLE;
 
-
 unsigned long lastPressTime = 0;
 const unsigned long TIMEOUT = 10000; // 10 segundos
 
 const unsigned long PUMP_TIME = 5000;  // 5 segundos
 const unsigned long MIXER_TIME = 5000; // 5 segundos
 
-//Configurações dos sensores
-
-void checkButtons();
-bool checkInterrupt();
-void preparePumps();
-void prepareButtons();
-void prepareActuators();
-void prepareSensors();
-void runMixingCycle();
-void displayMessage(String message);
-void resetToIdle();
-void allOff();
-void emptyContainer();
-void turnOnMixer();
-void turnOnPump1();
-void turnOnPump2();
-void resetToIdle();
+//status components
+bool status_pump1 = LOW;
+bool status_pump2 = LOW;
+bool status_valve = LOW;
+bool status_mixer = LOW;
 
 void setup() {
+  Serial.begin(115200);
+ 
+  WiFi.begin("IFPB-AUTO2", "");
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+ 
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  //MODBUS
+  mb.server();
+
   // Configuração dos pinos
   preparePumps();
   prepareButtons();
@@ -60,13 +82,23 @@ void setup() {
   lcd.begin(16, 2);            
   lcd.clear(); 
   lcd.print("Sistema pronto");
-  
-  Serial.begin(9600);
-  Serial.println("Sistema pronto");
-}
 
+  //MODBUS Registers
+  mb.addCoil(C1_COIL);
+  mb.addCoil(C2_COIL);
+  mb.addCoil(LOW_LEVEL_COIL);
+  mb.addCoil(HIGH_LEVEL_COIL);
+  mb.addIreg(PUMP1_COIL);
+  mb.addIreg(PUMP2_COIL);
+  mb.addIreg(MIXER_COIL);
+  mb.addIreg(VALVE_COIL);
+}
+ 
 void loop() {
-  // Verifica o estado do ciclo
+  //Call once inside loop() - all magic here
+  mb.task();
+
+    // Verifica o estado do ciclo
   switch (state) {
     case IDLE:
       checkButtons();
@@ -91,9 +123,18 @@ void loop() {
       resetToIdle();
       break;
   }
+
+delay(10);
 }
+
 void checkButtons() {
-  if (digitalRead(BUTTON_C1) == LOW) {
+  int C1_READ = digitalRead(BUTTON_C1) == LOW;
+  int C2_READ = digitalRead(BUTTON_C2) == LOW;
+
+  mb.Coil(C1_COIL, C1_READ);
+  mb.Coil(C2_COIL, C2_READ);
+
+  if (C1_READ) {
     if (state == IDLE) {
       state = WAITING_CONFIRMATION;
       lastPressTime = millis();
@@ -105,7 +146,7 @@ void checkButtons() {
       displayMessage("Iniciando ciclo...");
     }
     delay(200); // Debounce para evitar múltiplos acionamentos
-  } else if (digitalRead(BUTTON_C2) == LOW) {
+  } else if (C2_READ) {
     if (state == MIXING || state == WAITING_CONFIRMATION) {
       state = INTERRUPTED;
     } else if (state == IDLE) {
@@ -159,10 +200,16 @@ void emptyContainer() {
   Serial.println("Esvaziando recipiente...");
 
   digitalWrite(VALVE, HIGH);
+  status_valve = HIGH;
+  mb.Coil(VALVE_COIL, status_valve);
+
   while (digitalRead(LOW_LEVEL) == HIGH) {
     if (state == MIXING && checkInterrupt()) return; // Verifica se o botão C2 foi pressionado apenas no estado MIXING
   }
   digitalWrite(VALVE, LOW);
+  status_valve = LOW;
+  mb.Coil(VALVE_COIL, status_valve);
+
   displayMessage("Recipiente vazio");
   delay(2000); // Mostra a mensagem por 2 segundos
 }
@@ -176,10 +223,15 @@ void turnOnMixer() {
   Serial.println("Ligando misturador");
 
   digitalWrite(MIXER, HIGH);
+  status_mixer = HIGH;
+  mb.Coil(MIXER_COIL,status_mixer);
+
   while (millis() - startTime < 5000) {
     if (checkInterrupt() || state != MIXING) return;  // Verifica se o botão C2 foi pressionado ou o estado mudou
   }
   digitalWrite(MIXER, LOW);
+  status_mixer = LOW;
+  mb.Coil(MIXER_COIL,status_mixer);
 }
 
 void turnOnPump1() {
@@ -190,10 +242,15 @@ void turnOnPump1() {
   unsigned long startTime = millis();
 
   digitalWrite(PUMP1, HIGH);
+  status_pump1 = HIGH;
+  mb.Coil(PUMP1_COIL, status_pump1);
+
   while (millis() - startTime < 5000) {
     if (checkInterrupt() || state != MIXING) return; // Verifica se o botão C2 foi pressionado ou o estado mudou
   }
   digitalWrite(PUMP1, LOW);
+  status_pump1 = LOW;
+  mb.Coil(PUMP1_COIL, status_pump1);
 }
 
 void turnOnPump2() {
@@ -203,10 +260,15 @@ void turnOnPump2() {
   Serial.println("Acionando bomba2...");
 
   digitalWrite(PUMP2, HIGH);
+  status_pump2 = HIGH;
+  mb.Coil(PUMP2_COIL, status_pump2);
+
   while (digitalRead(HIGH_LEVEL) == HIGH) {
     if (checkInterrupt() || state != MIXING) return; // Verifica se o botão C2 foi pressionado ou o estado mudou
   }
   digitalWrite(PUMP2, LOW);
+  status_pump2 = LOW;
+  mb.Coil(PUMP2_COIL, status_pump2);
 }
 
 void resetToIdle() {
