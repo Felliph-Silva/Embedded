@@ -9,30 +9,30 @@
                "dataPointXid":"DP_350156",
                "bkgdColorOverride":"",
                "displayControls":false,
-               "height":0,
+               "height":50,
                "nameOverride":"",
-               "script":"var s = '';if (value)  s += \"<input type='button' value='OFF' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", false);return false;' \/>\"; else s += \"<input type='button' value='ON' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", true);return true;' \/>\"; return s;",
+               "script":"var s = '';if (value)  s += \"<input type='button' value='OFF' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", false);return false;' style='width:80px; height:50px;'\/>\"; else s += \"<input type='button' value='ON' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", true);return true;' style='width:80px; height:50px;'\/>\"; return s;",
                "settableOverride":false,
                "whenOffLabel":"ON",
                "whenOnLabel":"OFF",
-               "width":0,
-               "x":8,
-               "y":30
+               "width":80,
+               "x":291,
+               "y":215
             },
             {
                "type":"BUTTON",
                "dataPointXid":"DP_855701",
                "bkgdColorOverride":"",
                "displayControls":false,
-               "height":0,
+               "height":50,
                "nameOverride":"",
-               "script":"var s = '';if (value)  s += \"<input type='button' value='OFF' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", false);return false;' \/>\"; else s += \"<input type='button' value='ON' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", true);return true;' \/>\"; return s;",
+               "script":"var s = '';if (value)  s += \"<input type='button' value='OFF' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", false);return false;' style='width:80px; height:50px;'\/>\"; else s += \"<input type='button' value='ON' onclick='mango.view.setPoint(\"+ point.id +\",\"+ pointComponent.id +\", true);return true;' style='width:80px; height:50px;'\/>\"; return s;",
                "settableOverride":false,
                "whenOffLabel":"ON",
                "whenOnLabel":"OFF",
-               "width":0,
-               "x":44,
-               "y":29
+               "width":80,
+               "x":400,
+               "y":213
             },
             {
                "type":"HTML",
@@ -113,12 +113,24 @@
                "x":502,
                "y":80,
                "zeroImageIndex":12
+            },
+            {
+               "type":"HTML",
+               "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    C1\n<\/span>\n",
+               "x":317,
+               "y":183
+            },
+            {
+               "type":"HTML",
+               "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    C2\n<\/span>\n",
+               "x":427,
+               "y":183
             }
          ],
          "sharingUsers":[
          ],
          "backgroundFilename":null,
-         "name":"teste",
+         "name":"Centro de Controle",
          "xid":"GV_197241"
       }
    ],
@@ -136,7 +148,7 @@
          "contiguousBatches":false,
          "createSlaveMonitorPoints":true,
          "createSocketMonitorPoint":false,
-         "enabled":false,
+         "enabled":true,
          "encapsulated":false,
          "host":"192.168.0.119",
          "maxReadBitCount":2000,
@@ -659,6 +671,11 @@
    "pointValues":[
       {
          "pointXid":"DP_350156",
+         "timestamp":1726958416591,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_350156",
          "timestamp":1726955465642,
          "value":"true"
       },
@@ -1016,6 +1033,11 @@
          "pointXid":"DP_350156",
          "timestamp":1726947100212,
          "value":"false"
+      },
+      {
+         "pointXid":"DP_775827",
+         "timestamp":1726958416591,
+         "value":"true"
       },
       {
          "pointXid":"DP_775827",
