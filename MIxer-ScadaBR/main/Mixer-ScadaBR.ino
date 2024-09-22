@@ -159,6 +159,9 @@ void checkButtons() {
 
   // Lida com o botão C1 (início ou confirmação do ciclo)
   if (digitalRead(BUTTON_C1) == LOW || modbusC1Pressed) {
+    //Reseta o botão virtual
+    mb.Coil(C1_COIL,LOW);
+
     if (state == IDLE) {
       //atualiza o estado
       state = WAITING_CONFIRMATION;
@@ -178,6 +181,9 @@ void checkButtons() {
 
   // Lida com o botão C2 (interrupção ou esvaziamento)
   if (digitalRead(BUTTON_C2) == LOW || modbusC2Pressed) {
+    //Reseta o botão virtual
+    mb.Coil(C2_COIL,LOW);
+
     if (state == MIXING || state == WAITING_CONFIRMATION) {
      //atualiza o estado
       state = INTERRUPTED;
@@ -191,23 +197,73 @@ void checkButtons() {
 }
 
 void runMixingCycle() {
-  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
-  turnOnPump1();
+  static unsigned long stepStartTime = 0;
+  static int step = 0;
 
-  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
-  turnOnPump2();
+  switch (step) {
+    case 0: // Iniciar a bomba 1
+      Serial.println("Acionando bomba 1...");
+      digitalWrite(PUMP1, HIGH);
+      mb.Ists(PUMP1_ISTS, HIGH); // Envia status do atuador PUMP1
+      stepStartTime = millis();
+      step = 1; // Avança para o próximo passo
+      break;
 
-  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
-  turnOnMixer();
+    case 1: // Aguarda 5 segundos para a bomba 1
+      if (millis() - stepStartTime >= PUMP_TIME) {
+        digitalWrite(PUMP1, LOW);
+        mb.Ists(PUMP1_ISTS, LOW); // Atualiza status do atuador PUMP1
+        Serial.println("Bomba 1 desligada");
+        step = 2; // Avança para o próximo passo
+      }
+      break;
 
-  if (state != MIXING) return; // Verifica se ainda está no estado MIXING
-  emptyContainer();
+    case 2: // Iniciar a bomba 2
+      Serial.println("Acionando bomba 2...");
+      digitalWrite(PUMP2, HIGH);
+      mb.Ists(PUMP2_ISTS, HIGH); // Envia status do atuador PUMP2
+      stepStartTime = millis();
+      step = 3; // Avança para o próximo passo
+      break;
 
-  if (state == MIXING) {
-    //displayMessage("Ciclo concluido");
-    Serial.println("Ciclo concluido");
-    delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
-    resetToIdle();
+    case 3: // Aguarda até o nível alto ser atingido
+      if (digitalRead(HIGH_LEVEL) == LOW) {
+        digitalWrite(PUMP2, LOW);
+        mb.Ists(PUMP2_ISTS, LOW); // Atualiza status do atuador PUMP2
+        Serial.println("Bomba 2 desligada");
+        step = 4; // Avança para o próximo passo
+      }
+      break;
+
+    case 4: // Iniciar o mixer
+      Serial.println("Ligando misturador");
+      digitalWrite(MIXER, HIGH);
+      mb.Ists(MIXER_ISTS, HIGH); // Envia status do atuador MIXER
+      stepStartTime = millis();
+      step = 5; // Avança para o próximo passo
+      break;
+
+    case 5: // Aguarda 5 segundos para o mixer
+      if (millis() - stepStartTime >= MIXER_TIME) {
+        digitalWrite(MIXER, LOW);
+        mb.Ists(MIXER_ISTS, LOW); // Atualiza status do atuador MIXER
+        Serial.println("Misturador desligado");
+        step = 6; // Avança para o próximo passo
+      }
+      break;
+
+    case 6: // Esvaziar o recipiente
+      Serial.println("Esvaziando recipiente...");
+      emptyContainer();
+      step = 7; // Avança para o próximo passo
+      break;
+
+    case 7: // Finalizar o ciclo
+      Serial.println("Ciclo concluido");
+      delay(2000); // Aguarda 2 segundos antes de retornar ao estado IDLE
+      resetToIdle();
+      step = 0; // Reinicia os passos para o próximo ciclo
+      break;
   }
 }
 
@@ -216,6 +272,8 @@ bool checkInterrupt() {
   bool modbusC2Pressed = mb.Coil(C2_COIL);
 
   if (digitalRead(BUTTON_C2) == LOW || modbusC2Pressed) {
+    //Reseta o botão virtual
+    mb.Coil(C2_COIL,LOW);
     allOff(); // desliga todos os equipamentos
     state = INTERRUPTED;
     return true;
@@ -239,79 +297,95 @@ void allOff() {
 }
 
 void emptyContainer() {
-  //displayMessage("Esvaziando recipiente...");
-  Serial.println("Esvaziando recipiente...");
+  static bool valveOpen = false;
 
-  digitalWrite(VALVE, HIGH);
-  mb.Ists(VALVE_ISTS, HIGH); // Envia status do atuador VALVE
-
-  while (digitalRead(LOW_LEVEL) == HIGH) {
-    if (state == MIXING && checkInterrupt()) return;
-    yield();
+  if (!valveOpen) {
+    // Inicia a operação
+    Serial.println("Válvula aberta");
+    digitalWrite(VALVE, HIGH);
+    mb.Ists(VALVE_ISTS, HIGH); // Envia status do atuador VALVE
+    valveOpen = true; // Marca que a válvula foi aberta
   }
-  
-  digitalWrite(VALVE, LOW);
-  mb.Ists(VALVE_ISTS, LOW); // Atualiza status do atuador VALVE
-  //displayMessage("Recipiente vazio");
-  Serial.println("Recipiente vazio");
-  delay(2000);
+
+  // Verifica se o nível baixo foi atingido ou se houve interrupção
+  if (digitalRead(LOW_LEVEL) == LOW || checkInterrupt()) {
+    digitalWrite(VALVE, LOW);
+    mb.Ists(VALVE_ISTS, LOW); // Atualiza status do atuador VALVE
+    valveOpen = false; // Marca que a válvula foi fechada
+    Serial.println("Recipiente vazio");
+    delay(2000);
+
+  }
 }
 
 void turnOnMixer() {
-  if (state != MIXING) return;
-  
-  unsigned long startTime = millis();
-  //displayMessage("Ligando misturador");
-  Serial.println("Ligando misturador");
+  static unsigned long mixerStartTime = 0;
+  static bool mixerOn = false;
 
-  digitalWrite(MIXER, HIGH);
-  mb.Ists(MIXER_ISTS, HIGH); // Envia status do atuador MIXER
-
-  while (millis() - startTime < MIXER_TIME) {
-    if (checkInterrupt() || state != MIXING) return;
-    yield();
+  if (!mixerOn) {
+    // Inicia o misturador
+    Serial.println("Ligando misturador");
+    digitalWrite(MIXER, HIGH);
+    mb.Ists(MIXER_ISTS, HIGH); // Envia status do atuador MIXER
+    mixerStartTime = millis(); // Registra o momento em que o misturador foi ligado
+    mixerOn = true;
   }
-  
-  digitalWrite(MIXER, LOW);
-  mb.Ists(MIXER_ISTS, LOW); // Atualiza status do atuador MIXER
+
+  // Verifica se o tempo do misturador acabou ou se houve interrupção
+  if (millis() - mixerStartTime < MIXER_TIME || checkInterrupt()) {
+    digitalWrite(MIXER, LOW);
+    mb.Ists(MIXER_ISTS, LOW); // Atualiza status do atuador MIXER
+    mixerOn = false;
+    Serial.println("Misturador desligado");
+  }
 }
+
 
 void turnOnPump1() {
-  if (state != MIXING) return;
-  
-  //displayMessage("Acionando bomba1");
-  Serial.println("Acionando bomba 1...");
-  unsigned long startTime = millis();
+  static unsigned long pump1StartTime = 0;
+  static bool pump1On = false;
 
-  digitalWrite(PUMP1, HIGH);
-  mb.Ists(PUMP1_ISTS, HIGH); // Envia status do atuador PUMP1
-
-  while (millis() - startTime < PUMP_TIME) {
-    if (checkInterrupt() || state != MIXING) return;
-    yield();
+  if (!pump1On) {
+    // Inicia a bomba 1
+    Serial.println("Acionando bomba 1...");
+    digitalWrite(PUMP1, HIGH);
+    mb.Ists(PUMP1_ISTS, HIGH); // Envia status do atuador PUMP1
+    pump1StartTime = millis(); // Registra o tempo inicial
+    pump1On = true;
   }
-  
-  digitalWrite(PUMP1, LOW);
-  mb.Ists(PUMP1_ISTS, LOW); // Atualiza status do atuador PUMP1
+
+  // Verifica se o tempo da bomba 1 acabou ou se houve interrupção
+  if (millis() - pump1StartTime < PUMP_TIME || checkInterrupt()) {
+    digitalWrite(PUMP1, LOW);
+    mb.Ists(PUMP1_ISTS, LOW); // Atualiza status do atuador PUMP1
+    pump1On = false;
+    Serial.println("Bomba 1 desligada");
+  }
 }
+
 
 void turnOnPump2() {
-  if (state != MIXING) return;
-
-  //displayMessage("Acionando bomba2");
-  Serial.println("Acionando bomba 2...");
-
-  digitalWrite(PUMP2, HIGH);
-  mb.Ists(PUMP2_ISTS, HIGH); // Envia status do atuador PUMP2
-
-  while (digitalRead(HIGH_LEVEL) == HIGH) {
-    if (checkInterrupt() || state != MIXING) return;
-    yield();
-  }
+  static bool pump2On = false;
   
-  digitalWrite(PUMP2, LOW);
-  mb.Ists(PUMP2_ISTS, LOW); // Atualiza status do atuador PUMP2
+  // Verifica o estado do sensor de nível alto (HIGH_LEVEL)
+  if (!pump2On && digitalRead(HIGH_LEVEL) == HIGH) {
+    // Inicia a bomba 2
+    Serial.println("Acionando bomba 2...");
+    digitalWrite(PUMP2, HIGH);
+    mb.Ists(PUMP2_ISTS, HIGH); // Envia status do atuador PUMP2
+    pump2On = true;
+  }
+
+  // Verifica se o nível alto foi atingido ou houve interrupção
+  if (pump2On && (digitalRead(HIGH_LEVEL) == LOW || checkInterrupt())) {
+    // Desliga a bomba 2
+    digitalWrite(PUMP2, LOW);
+    mb.Ists(PUMP2_ISTS, LOW); // Atualiza status do atuador PUMP2
+    pump2On = false;
+    Serial.println("Bomba 2 desligada");
+  }
 }
+
 
 void resetToIdle() {
   state = IDLE;
