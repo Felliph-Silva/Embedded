@@ -4,7 +4,6 @@
 #include <WiFi.h>
 #endif
 #include <ModbusIP_ESP8266.h>
-#include <LiquidCrystal.h>
 
 // Modbus Registers Offsets
 const int C1_COIL = 100;
@@ -42,10 +41,6 @@ unsigned long lastPressTime = 0;
 const unsigned long TIMEOUT = 10000; // 10 segundos
 const unsigned long PUMP_TIME = 5000;  // 5 segundos
 const unsigned long MIXER_TIME = 5000; // 5 segundos
-
-//estado dos botões físicos
-bool stateC1 = LOW;
-bool stateC2 = LOW;
 
 void setup() {
   Serial.begin(115200);
@@ -143,7 +138,6 @@ void loop() {
       mb.Ists(EMPTYING_ISTS, HIGH);
 
       emptyContainer();
-      resetToIdle();
       break;
 
     case INTERRUPTED:
@@ -238,14 +232,17 @@ void runMixingCycle() {
       step = 3;
       break;
 
-    case 3:
-      if (digitalRead(HIGH_LEVEL) == LOW) {
+    case 3:{
+      int HighLevel = digitalRead(HIGH_LEVEL);
+
+      if (HighLevel == LOW) {
         digitalWrite(PUMP2, LOW);
         mb.Ists(PUMP2_ISTS, LOW);
         Serial.println("Bomba 2 desligada");
         step = 4;
       }
       break;
+    }
 
     case 4:
       Serial.println("Ligando misturador");
@@ -261,26 +258,35 @@ void runMixingCycle() {
         mb.Ists(MIXER_ISTS, LOW);
         Serial.println("Misturador desligado");
         state = EMPTYING;
+        step = 0;//reseta o step
       }
       break;
   }
 }
 
 void emptyContainer() {
-  static bool valveOpen = false;
-  if (!valveOpen) {
-    Serial.println("Válvula aberta");
-    digitalWrite(VALVE, HIGH);
-    mb.Ists(VALVE_ISTS, HIGH);
-    valveOpen = true;
-  }
+  static int step = 0;
+  
+  switch (step) {
+    case 0:
+      // Válvula fechada, pronta para abrir
+      Serial.println("Abrindo válvula...");
+      digitalWrite(VALVE, HIGH);  // Abre a válvula
+      mb.Ists(VALVE_ISTS, HIGH);  // Atualiza o status via Modbus
+      step = 1;  // Passa para o próximo passo
+      break;
 
-  if (digitalRead(LOW_LEVEL) == LOW && valveOpen) {
-    digitalWrite(VALVE, LOW);
-    mb.Ists(VALVE_ISTS, LOW);
-    valveOpen = false;
-    Serial.println("Recipiente vazio");
-    delay(200);
+    case 1: 
+
+      if (digitalRead(LOW_LEVEL) == LOW) {
+        // O sensor de nível baixo foi atingido, fecha a válvula
+        digitalWrite(VALVE, LOW);  // Fecha a válvula
+        mb.Ists(VALVE_ISTS, LOW);  // Atualiza o status via Modbus
+        Serial.println("Válvula fechada, recipiente vazio");
+        resetToIdle();
+        step = 0;//reseta o step
+      }
+      break;
   }
 }
 
