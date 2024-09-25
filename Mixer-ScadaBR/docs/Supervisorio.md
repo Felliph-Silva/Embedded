@@ -68,12 +68,13 @@ A figura 1 mostra a pinagem da ESP32.
 
 | Componente              | Pino no ESP32 |
 |-------------------------|---------------|
-| **Bomba 1**             | D2 (GPIO 4)   |
-| **Bomba 2**             | D4 (GPIO 2)   |
-| **Misturador**          | D7 (GPIO 13)  |
-| **Válvula Solenoide**   | D8 (GPIO 15)  |
-| **Sensor de Nível Baixo** | D5 (GPIO 14) |
-| **Sensor de Nível Cheio** | D6 (GPIO 12) |
+| **Bomba 1**             | GPIO 13   |
+| **Bomba 2**             | GPIO 12   |
+| **Misturador**          | GPIO 14  |
+| **Válvula Solenoide**   | GPIO 27  |
+| **Sensor de Nível Baixo** | GPIO 26 |
+| **Sensor de Nível Cheio** | GPIO 25 |
+| **Display LCD I2C** | GPIO 21 (SDA_PIN), GPIO 22 (SCL_PIN) |
 
 ## Ciclo de Mistura
 
