@@ -45,7 +45,7 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("brisa-2462836", "metvuuk3");
+  WiFi.begin("SSID", "PassWord");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
