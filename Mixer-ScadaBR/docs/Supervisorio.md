@@ -109,7 +109,7 @@ O ciclo de mistura funciona em etapas:
 
 ## Implementação
 
-O código utiliza a biblioteca **ModbusIP_ESP8266** para a comunicação Modbus, gerenciando a interação com os coils e inputs digitais. O ciclo de mistura é controlado de forma automática, e os estados são atualizados continuamente no supervisório via Modbus.
+O código utiliza a biblioteca **ModbusIP_ESP8266** para a comunicação Modbus, gerenciando a interação com os coils e inputs digitais. O ciclo de mistura é controlado de forma automática, e os estados são atualizados continuamente no supervisório via Modbus, o código pode ser visualozado [aqui](/Mixer-ScadaBR/main/Mixer-ScadaBR/Mixer-ScadaBR.ino).
 
 ### 1. Tabela de Máquina de Estados
 
