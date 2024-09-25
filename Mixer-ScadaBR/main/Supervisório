@@ -17,7 +17,7 @@
                "whenOnLabel":"OFF",
                "width":80,
                "x":291,
-               "y":180
+               "y":200
             },
             {
                "type":"BUTTON",
@@ -32,31 +32,31 @@
                "whenOnLabel":"OFF",
                "width":80,
                "x":398,
-               "y":181
+               "y":200
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    IDLE\n<\/span>\n",
                "x":63,
-               "y":45
+               "y":80
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    WAITING\n<\/span>\n",
                "x":147,
-               "y":48
+               "y":80
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    MIXING\n<\/span>\n",
                "x":257,
-               "y":48
+               "y":80
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    INTERRUPTED\n<\/span>\n",
                "x":495,
-               "y":50
+               "y":80
             },
             {
                "type":"BINARY_GRAPHIC",
@@ -69,7 +69,7 @@
                "oneImageIndex":13,
                "settableOverride":false,
                "x":70,
-               "y":73,
+               "y":110,
                "zeroImageIndex":12
             },
             {
@@ -83,7 +83,7 @@
                "oneImageIndex":13,
                "settableOverride":false,
                "x":174,
-               "y":75,
+               "y":110,
                "zeroImageIndex":12
             },
             {
@@ -97,7 +97,7 @@
                "oneImageIndex":13,
                "settableOverride":false,
                "x":277,
-               "y":75,
+               "y":110,
                "zeroImageIndex":12
             },
             {
@@ -111,20 +111,20 @@
                "oneImageIndex":13,
                "settableOverride":false,
                "x":542,
-               "y":73,
+               "y":110,
                "zeroImageIndex":12
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    C1\n<\/span>\n",
                "x":316,
-               "y":143
+               "y":160
             },
             {
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    C2\n<\/span>\n",
                "x":428,
-               "y":143
+               "y":160
             },
             {
                "type":"BINARY_GRAPHIC",
@@ -178,7 +178,7 @@
                "type":"HTML",
                "content":"<!-- @license MIT -->\n\n<!-- This generates a simple text -->\n\n<span style=\"color: #333333; font-weight: bold; font-size: 18px;\">\n    EMPTYING\n<\/span>\n",
                "x":362,
-               "y":49
+               "y":80
             },
             {
                "type":"BINARY_GRAPHIC",
@@ -191,7 +191,7 @@
                "oneImageIndex":13,
                "settableOverride":false,
                "x":393,
-               "y":75,
+               "y":110,
                "zeroImageIndex":12
             },
             {
@@ -229,7 +229,7 @@
          ],
          "sharingUsers":[
          ],
-         "backgroundFilename":null,
+         "backgroundFilename":"uploads\/3.png",
          "name":"Centro de Controle",
          "xid":"GV_197241"
       }
@@ -248,9 +248,9 @@
          "contiguousBatches":false,
          "createSlaveMonitorPoints":true,
          "createSocketMonitorPoint":false,
-         "enabled":false,
+         "enabled":true,
          "encapsulated":false,
-         "host":"192.168.0.119",
+         "host":"192.168.0.5",
          "maxReadBitCount":2000,
          "maxReadRegisterCount":125,
          "maxWriteRegisterCount":120,
@@ -802,6 +802,16 @@
          "sharingUsers":[
          ],
          "name":"(sem nome)"
+      },
+      {
+         "xid":"WL_767014",
+         "user":"admin",
+         "dataPoints":[
+            "DP_350156"
+         ],
+         "sharingUsers":[
+         ],
+         "name":"(sem nome)"
       }
    ],
    "maintenanceEvents":[
@@ -809,6 +819,26 @@
    "scripts":[
    ],
    "pointValues":[
+      {
+         "pointXid":"DP_350156",
+         "timestamp":1727118674172,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_350156",
+         "timestamp":1727118674034,
+         "value":"true"
+      },
+      {
+         "pointXid":"DP_350156",
+         "timestamp":1727118668172,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_350156",
+         "timestamp":1727118667681,
+         "value":"true"
+      },
       {
          "pointXid":"DP_350156",
          "timestamp":1727037139462,
@@ -1290,24 +1320,9 @@
          "value":"true"
       },
       {
-         "pointXid":"DP_350156",
-         "timestamp":1727027876535,
+         "pointXid":"DP_775827",
+         "timestamp":1727118891172,
          "value":"false"
-      },
-      {
-         "pointXid":"DP_350156",
-         "timestamp":1727027876281,
-         "value":"true"
-      },
-      {
-         "pointXid":"DP_350156",
-         "timestamp":1727027870535,
-         "value":"false"
-      },
-      {
-         "pointXid":"DP_350156",
-         "timestamp":1727027870340,
-         "value":"true"
       },
       {
          "pointXid":"DP_775827",
@@ -1805,11 +1820,6 @@
          "value":"true"
       },
       {
-         "pointXid":"DP_775827",
-         "timestamp":1727022383053,
-         "value":"false"
-      },
-      {
          "pointXid":"DP_855701",
          "timestamp":1727037233462,
          "value":"false"
@@ -2296,17 +2306,27 @@
       },
       {
          "pointXid":"DP_855701",
+         "timestamp":1726954907502,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_855701",
          "timestamp":1726954899924,
          "value":"true"
       },
       {
          "pointXid":"DP_855701",
-         "timestamp":1726954881762,
+         "timestamp":1726954899924,
+         "value":"true"
+      },
+      {
+         "pointXid":"DP_661993",
+         "timestamp":1727118680172,
          "value":"false"
       },
       {
-         "pointXid":"DP_855701",
-         "timestamp":1726954868876,
+         "pointXid":"DP_661993",
+         "timestamp":1727118675172,
          "value":"true"
       },
       {
@@ -2800,13 +2820,8 @@
          "value":"true"
       },
       {
-         "pointXid":"DP_661993",
-         "timestamp":1727018560053,
-         "value":"false"
-      },
-      {
-         "pointXid":"DP_661993",
-         "timestamp":1727018555053,
+         "pointXid":"DP_021129",
+         "timestamp":1727118680172,
          "value":"true"
       },
       {
@@ -3790,6 +3805,11 @@
          "value":"false"
       },
       {
+         "pointXid":"DP_306588",
+         "timestamp":1726949710013,
+         "value":"false"
+      },
+      {
          "pointXid":"DP_683918",
          "timestamp":1727037238462,
          "value":"false"
@@ -4202,6 +4222,16 @@
       {
          "pointXid":"DP_683918",
          "timestamp":1726949710013,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_683918",
+         "timestamp":1726949710013,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_403734",
+         "timestamp":1727118668172,
          "value":"false"
       },
       {
@@ -4700,9 +4730,14 @@
          "value":"true"
       },
       {
-         "pointXid":"DP_403734",
-         "timestamp":1727024335053,
+         "pointXid":"DP_848227",
+         "timestamp":1727118675172,
          "value":"false"
+      },
+      {
+         "pointXid":"DP_848227",
+         "timestamp":1727118668172,
+         "value":"true"
       },
       {
          "pointXid":"DP_848227",
@@ -5195,13 +5230,8 @@
          "value":"true"
       },
       {
-         "pointXid":"DP_848227",
-         "timestamp":1727023210053,
-         "value":"false"
-      },
-      {
-         "pointXid":"DP_848227",
-         "timestamp":1727023209053,
+         "pointXid":"DP_411558",
+         "timestamp":1727118675172,
          "value":"true"
       },
       {
@@ -5700,11 +5730,6 @@
          "value":"false"
       },
       {
-         "pointXid":"DP_411558",
-         "timestamp":1727010407237,
-         "value":"true"
-      },
-      {
          "pointXid":"DP_193769",
          "timestamp":1726963541877,
          "value":"false"
@@ -5721,8 +5746,23 @@
       },
       {
          "pointXid":"DP_193769",
+         "timestamp":1726954973447,
+         "value":"false"
+      },
+      {
+         "pointXid":"DP_193769",
          "timestamp":1726954878447,
          "value":"true"
+      },
+      {
+         "pointXid":"DP_193769",
+         "timestamp":1726954878447,
+         "value":"true"
+      },
+      {
+         "pointXid":"DP_193769",
+         "timestamp":1726953933447,
+         "value":"false"
       },
       {
          "pointXid":"DP_193769",
@@ -5926,5 +5966,7 @@
          "emailSmtpUsername":"",
          "eventPurgePeriods":1
       }
+   ],
+   "usersProfiles":[
    ]
 }
