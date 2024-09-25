@@ -55,15 +55,18 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("SSID", "PassWord");
+  WiFi.begin("IFPB-AUTO2", "");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println("");
   Serial.println("WiFi connected");
+  displayMessage("WIFI connected");
   Serial.println("IP address: ");
+  displayMessage("IP address: ");
   Serial.println(WiFi.localIP());
+  //displayMessage(WiFi.localIP());
 
   //Display config
   Wire.begin(SDA_PIN, SCL_PIN);
@@ -99,6 +102,7 @@ void setup() {
   mb.addIsts(EMPTYING_ISTS);
 
   Serial.println("Sistema pronto!");
+  displayMessage("Sistema pronto!");
 }
 
 void loop() {
@@ -183,11 +187,13 @@ void checkButtons() {
       state = WAITING_CONFIRMATION;
       lastPressTime = millis();
       Serial.println("Iniciar ciclo? Pressione C1 para confirmar.");
+      displayMessage("Iniciar ciclo? C1 para confirmar");
     } else if (state == WAITING_CONFIRMATION) {
       // Atualiza o estado para MIXING
       state = MIXING;
       lastPressTime = millis(); // Reinicia o contador do tempo
       Serial.println("Iniciando ciclo...");
+      displayMessage("Iniciando ciclo...");
     } else if (state == INTERRUPTED) {
       // Volta para o estado IDLE
       resetToIdle();
@@ -205,6 +211,7 @@ void checkButtons() {
       // Atualiza o estado para INTERRUPTED
       state = INTERRUPTED;
       Serial.println("Equipamentos desligados!");
+      displayMessage("Equipamentos desligados!");
     } else if (state == WAITING_CONFIRMATION) {
       // Cancela a operação e volta para o estado IDLE
       resetToIdle();
@@ -229,6 +236,7 @@ void runMixingCycle() {
   switch (step) {
     case 0:
       Serial.println("Acionando bomba 1...");
+      displayMessage("Acionando bomba 1...");
       digitalWrite(PUMP1, HIGH);
       mb.Ists(PUMP1_ISTS, HIGH);
       stepStartTime = millis();
@@ -240,12 +248,14 @@ void runMixingCycle() {
         digitalWrite(PUMP1, LOW);
         mb.Ists(PUMP1_ISTS, LOW);
         Serial.println("Bomba 1 desligada");
+        displayMessage("Bomba 1 desligada");
         step = 2;
       }
       break;
 
     case 2:
       Serial.println("Acionando bomba 2...");
+      displayMessage("Acionando bomba 2...");
       digitalWrite(PUMP2, HIGH);
       mb.Ists(PUMP2_ISTS, HIGH);
       step = 3;
@@ -258,6 +268,7 @@ void runMixingCycle() {
         digitalWrite(PUMP2, LOW);
         mb.Ists(PUMP2_ISTS, LOW);
         Serial.println("Bomba 2 desligada");
+        displayMessage("Bomba 2 desligada");
         step = 4;
       }
       break;
@@ -265,6 +276,7 @@ void runMixingCycle() {
 
     case 4:
       Serial.println("Ligando misturador");
+      displayMessage("Ligando misturador");
       digitalWrite(MIXER, HIGH);
       mb.Ists(MIXER_ISTS, HIGH);
       stepStartTime = millis();
@@ -276,6 +288,7 @@ void runMixingCycle() {
         digitalWrite(MIXER, LOW);
         mb.Ists(MIXER_ISTS, LOW);
         Serial.println("Misturador desligado");
+        displayMessage("Misturador desligado");
         state = EMPTYING;
         step = 0; // reseta o step
       }
@@ -295,6 +308,7 @@ void emptyContainer() {
     case 0:
       // Válvula fechada, pronta para abrir
       Serial.println("Abrindo válvula...");
+      displayMessage("Abrindo valvula...");
       digitalWrite(VALVE, HIGH);  // Abre a válvula
       mb.Ists(VALVE_ISTS, HIGH);  // Atualiza o status via Modbus
       stepEmpty = 1;  // Passa para o próximo passo
@@ -307,6 +321,7 @@ void emptyContainer() {
         digitalWrite(VALVE, LOW);  // Fecha a válvula
         mb.Ists(VALVE_ISTS, LOW);  // Atualiza o status via Modbus
         Serial.println("Válvula fechada, recipiente vazio");
+        displayMessage("Recipiente vazio");
         resetToIdle();
         stepEmpty = 0;//reseta o step
       }
@@ -324,6 +339,7 @@ bool checkInterrupt() {
 
     state = INTERRUPTED;
     Serial.println("Sistema interrompido!");
+    displayMessage("All off! Sistema interrompido!");
 
     step = 0;//reseta o step do ciclo de mistura
     stepEmpty = 0;//reseta o step do ciclo de esvaziamento
@@ -347,6 +363,7 @@ void allOff() {
 void resetToIdle(){
   state = IDLE;
   Serial.println("Sistema pronto!");
+  displayMessage("Sistema pronto!");
 }
 
 void displayMessage(String message) {
