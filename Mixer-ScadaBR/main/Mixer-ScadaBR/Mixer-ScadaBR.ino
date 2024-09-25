@@ -45,7 +45,7 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("SSID", "PassWord");
+  WiFi.begin("brisa-2462836", "metvuuk3");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -148,6 +148,7 @@ void loop() {
       mb.Ists(INTERRUPTED_ISTS, HIGH);
       mb.Ists(EMPTYING_ISTS, LOW);
 
+      allOff();
       checkButtons();
       break;
   }
@@ -189,7 +190,6 @@ void checkButtons() {
     if (state == MIXING) {
       // Atualiza o estado para INTERRUPTED
       state = INTERRUPTED;
-      Serial.println("Equipamentos desligados!");
     } else if (state == WAITING_CONFIRMATION) {
       // Cancela a operação e volta para o estado IDLE
       resetToIdle();
@@ -202,17 +202,13 @@ void checkButtons() {
   }
 }
 
-int step = 0;
-
 void runMixingCycle() {
-  if (checkInterrupt()) {
-    return; // Sai da função se o ciclo for interrompido
-  }
-
   static unsigned long stepStartTime = 0;
+  static int step = 0;
 
   switch (step) {
     case 0:
+    //checkButtons();
       Serial.println("Acionando bomba 1...");
       digitalWrite(PUMP1, HIGH);
       mb.Ists(PUMP1_ISTS, HIGH);
@@ -262,27 +258,22 @@ void runMixingCycle() {
         mb.Ists(MIXER_ISTS, LOW);
         Serial.println("Misturador desligado");
         state = EMPTYING;
-        step = 0; // reseta o step
+        step = 0;//reseta o step
       }
       break;
   }
 }
 
-int stepEmpty = 0;
-
 void emptyContainer() {
-
-  if (checkInterrupt()) {
-    return; // Sai da função se o ciclo for interrompido
-  }
+  static int step = 0;
   
-  switch (stepEmpty) {
+  switch (step) {
     case 0:
       // Válvula fechada, pronta para abrir
       Serial.println("Abrindo válvula...");
       digitalWrite(VALVE, HIGH);  // Abre a válvula
       mb.Ists(VALVE_ISTS, HIGH);  // Atualiza o status via Modbus
-      stepEmpty = 1;  // Passa para o próximo passo
+      step = 1;  // Passa para o próximo passo
       break;
 
     case 1: 
@@ -293,7 +284,7 @@ void emptyContainer() {
         mb.Ists(VALVE_ISTS, LOW);  // Atualiza o status via Modbus
         Serial.println("Válvula fechada, recipiente vazio");
         resetToIdle();
-        stepEmpty = 0;//reseta o step
+        step = 0;//reseta o step
       }
       break;
   }
@@ -302,17 +293,9 @@ void emptyContainer() {
 bool checkInterrupt() {
   bool modbusC2Pressed = mb.Coil(C2_COIL);
   if (modbusC2Pressed) {
-    mb.Coil(C2_COIL, LOW);//reseta o estado de c2
-
+    mb.Coil(C2_COIL, LOW);
     allOff();
-    Serial.println("Equipamentos desligados!");
-
     state = INTERRUPTED;
-    Serial.println("Sistema interrompido!");
-
-    step = 0;//reseta o step do ciclo de mistura
-    stepEmpty = 0;//reseta o step do ciclo de esvaziamento
-    
     return true;
   }
   return false;
