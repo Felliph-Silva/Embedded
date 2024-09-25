@@ -8,6 +8,9 @@
 //bibliotecas para o display
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+//pinos do display
+#define SDA_PIN 21
+#define SCL_PIN 22
 
 // Modbus Registers Offsets
 const int C1_COIL = 100;
@@ -49,7 +52,7 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("Maxprint_MWR-150", "outrasenha");
+  WiFi.begin("IFPB-AUTO2", "");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
