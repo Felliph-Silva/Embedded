@@ -23,8 +23,8 @@ const int EMPTYING_ISTS = 112;
 //Used Pins
 const int PUMP1 = 4; //D2
 const int PUMP2 = 2;  //D4
-//const int BUTTON_C1 = 16; //D0
-//const int BUTTON_C2 = 5; //D1
+const int BUTTON_C1 = 18; //D0
+const int BUTTON_C2 = 19; //D1
 const int MIXER = 13; //D7
 const int VALVE = 15; //D8
 const int LOW_LEVEL = 14; //D5
@@ -45,7 +45,7 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("brisa-2462836", "metvuuk3");
+  WiFi.begin("IFPB-AUTO2", "");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
