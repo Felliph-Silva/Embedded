@@ -5,6 +5,10 @@
 #endif
 #include <ModbusIP_ESP8266.h>
 
+//bibliotecas para o display
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
 // Modbus Registers Offsets
 const int C1_COIL = 100;
 const int C2_COIL = 101;  
@@ -21,14 +25,14 @@ const int INTERRUPTED_ISTS = 111;
 const int EMPTYING_ISTS = 112;
 
 //Used Pins
-const int PUMP1 = 4; //D2
-const int PUMP2 = 2;  //D4
+const int PUMP1 = 13;
+const int PUMP2 = 12;
 //const int BUTTON_C1 = 16; //D0
 //const int BUTTON_C2 = 5; //D1
-const int MIXER = 13; //D7
-const int VALVE = 15; //D8
-const int LOW_LEVEL = 14; //D5
-const int HIGH_LEVEL = 12; //D6
+const int MIXER = 14;
+const int VALVE = 27;
+const int LOW_LEVEL = 26;
+const int HIGH_LEVEL = 25;
 
 // ModbusIP object
 ModbusIP mb;
@@ -45,7 +49,7 @@ const unsigned long MIXER_TIME = 5000; // 5 segundos
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin("SSID", "PassWord");
+  WiFi.begin("Maxprint_MWR-150", "outrasenha");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
