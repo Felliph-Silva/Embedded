@@ -6,14 +6,14 @@
 // are used. Please use this code if your 
 // platform does not support ATOMIC_BLOCK.
 
-
 // Pins
-#define ENCA 3
-#define ENCB 2
-#define PWM 4
-#define IN1 5
-#define IN2 6
-#define POT A0
+#define ENCA 2//27
+#define ENCB 3//26
+#define PWM 8//14
+#define IN1 6//13
+#define IN2 7//12
+#define POT A0//25
+
 
 // globals
 long prevT = 0;
@@ -31,8 +31,8 @@ float v2Prev = 0;
 
 float eintegral = 0;
 
-  float kp = 1e-2;
-  float ki = 5;
+  float kp = 2;
+  float ki = 12;
 
 void setup() {
   Serial.begin(115200);
@@ -44,7 +44,8 @@ void setup() {
   pinMode(IN2,OUTPUT);
   pinMode(POT, INPUT);
 
-  attachInterrupt(digitalPinToInterrupt(ENCA),readEncoder,RISING);
+  attachInterrupt(digitalPinToInterrupt(ENCA),
+                  readEncoder,RISING);
 }
 
 void loop() {
@@ -52,9 +53,7 @@ void loop() {
   // read the position and velocity
   int pos = 0;
   float velocity2 = 0;
-  
   noInterrupts(); // disable interrupts temporarily while reading
-
   pos = pos_i;
   velocity2 = velocity_i;
   interrupts(); // turn interrupts back on
@@ -78,8 +77,8 @@ void loop() {
 
   // Set a target
   int pot = analogRead(POT);
-  int pot_scaled=  map( pot, 0, 1023, 0, 100);
-  float vt = 100; //*(sin(currT/1e3)>0);
+  int pot_scaled=  map( pot, 0, 1023, 0, 255);
+  float vt = pot_scaled; //*(sin(currT/1e3)>0);
 
   // Compute the control signal u
   float e = vt-v1Filt;
@@ -101,11 +100,9 @@ void loop() {
 
   Serial.print(vt);
   Serial.print(" ");
-  Serial.print(v1Filt);
+  Serial.print(v1);
   Serial.println();
   delay(300);
-
-  attachInterrupt(digitalPinToInterrupt(ENCA),readEncoder,RISING);
 }
 
 void setMotor(int dir, int pwmVal, int pwm, int in1, int in2){
