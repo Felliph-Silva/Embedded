@@ -71,7 +71,7 @@ void loop() {
 
   // Set a target
   int pot = analogRead(POT);
-  int pot_scaled = map(pot, 0, 1023, 0, 240);
+  int pot_scaled = map(pot, 0, 1023, 0, 260);
   float vt = pot_scaled;
 
   // Compute the control signal u (PID)
