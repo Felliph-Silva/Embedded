@@ -31,8 +31,8 @@ float v2Prev = 0;
 
 float eintegral = 0;
 
-  float kp = 1e-2;
-  float ki = 5;
+  float kp = 1e-3;
+  float ki = 1e-2;
 
 void setup() {
   Serial.begin(115200);
@@ -71,6 +71,7 @@ void loop() {
   float v2 = velocity2/600.0*60.0;
 
   // Low-pass filter (25 Hz cutoff)
+
   v1Filt = 0.854*v1Filt + 0.0728*v1 + 0.0728*v1Prev;
   v1Prev = v1;
   v2Filt = 0.854*v2Filt + 0.0728*v2 + 0.0728*v2Prev;
@@ -78,8 +79,8 @@ void loop() {
 
   // Set a target
   int pot = analogRead(POT);
-  int pot_scaled=  map( pot, 0, 1023, 0, 100);
-  float vt = 100; //*(sin(currT/1e3)>0);
+  int pot_scaled=  map( pot, 0, 1023, 0, 260);
+  float vt = pot_scaled; //*(sin(currT/1e3)>0);
 
   // Compute the control signal u
   float e = vt-v1Filt;
@@ -102,8 +103,10 @@ void loop() {
   Serial.print(vt);
   Serial.print(" ");
   Serial.print(v1Filt);
+  Serial.print(" ");
+  Serial.print(v1);
   Serial.println();
-  delay(300);
+  delay(50);
 
   attachInterrupt(digitalPinToInterrupt(ENCA),readEncoder,RISING);
 }
