@@ -1,9 +1,10 @@
 // Pins
-#define ENCA 5
-#define ENCB 6
-#define PWM 2
-#define IN1 3
-#define IN2 4
+#define ENCA 3 // Green
+#define ENCB 2 //Yellow
+#define PWM 4
+#define IN1 5
+#define IN2 6
+#define POT A0
 
 // Globals
 long prevT = 0;
@@ -16,7 +17,7 @@ float v1Filt = 0;
 float v1Prev = 0;
 float v2Filt = 0;
 float v2Prev = 0;
-static float vtFiltered = 0;
+static float vtFiltered = 200;
 
 
 float eintegral = 0;
@@ -62,16 +63,16 @@ void loop() {
   vtFiltered = 0.9 * vtFiltered + 0.1 * vt;  // Filtragem simples da referência
 */
   // Calcular o sinal de controle PID
-  float u = computePID(280, v1Filt, deltaT);
+  float u = computePID(vtFiltered, v1Filt, deltaT);
 
   // Configurar o motor
   controlMotor(u);
 
   // Saída para depuração
-  debugOutput(280, v1Filt, v1, e, pwr);
+  debugOutput(vtFiltered, v1Filt, v1, e, pwr);
 
   attachInterrupt(digitalPinToInterrupt(ENCA), readEncoder, RISING);
-  delay(50);
+  delay(25);
 }
 
 // Função para obter posição e velocidade do encoder
@@ -99,14 +100,14 @@ void filterVelocities(float v1, float v2) {
   v2Filt = 0.854 * v2Filt + 0.0728 * v2 + 0.0728 * v2Prev;
   v2Prev = v2;
 }
-/*
+
 // Função para ler o valor alvo do potenciômetro
 float readTargetSpeed() {
   int pot = analogRead(POT);
   int pot_scaled = map(pot, 0, 1023, 0, 285);
   return pot_scaled;
 }
-*/
+
 // Função para calcular o sinal de controle PID
 float computePID(float vt1, float v1Filt, float deltaT) {
   e = vt1 - v1Filt;
